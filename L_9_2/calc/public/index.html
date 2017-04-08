@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;
+		charset=utf-8" />
+		<title>AJAX calc test</title>
+		<script>
+			calc_url= location.protocol + "//" + location.host + "/calc/view.json"
+			function send_query()
+			{
+				var frm = document.forms.calc_form;
+				var param_str = "";
+				var radios = frm.op;
+				for (var i = 0; i < radios.length; i++) 
+				{
+					if (radios[i].checked) 
+					{
+						param_str = "?" +
+						"v1=" + frm.v1.value +
+						"&v2=" + frm.v2.value +
+						"&op=" +
+						encodeURIComponent(frm.op[i].value)
+						break;
+					}
+				}
+				if (param_str == "") return false;
+				var my_JSON_object = {};
+				var http_request = new XMLHttpRequest();
+				http_request.open("GET", calc_url+param_str, true);
+				http_request.onreadystatechange = function () 
+				{
+					var done = 4, ok = 200;
+					if (http_request.readyState == done && http_request.status == ok) 
+					{
+						my_JSON_object =
+						JSON.parse(http_request.responseText);
+						show_result(my_JSON_object);
+					}
+				};
+				http_request.send(null);
+				return false;
+			}
+			function show_result(data)
+			{
+				var result = document.getElementById("result");
+				result.innerHTML = "<hr/>Result is: " + data.value + "<hr/><p>"+Date()+"</p>";
+			}
+		</script>
+	</head>
+	<body>
+		<form name="calc_form" method="get">
+			<label for="Value_1:">Value 1:</label>
+			<input id="v1" name="v1" type="text" /> <br/>
+			<label for="Value_2">Value 2</label>
+			<input id="v2" name="v2" type="text" /> <br/>
+			<label for="_">+</label>
+			<input id="op__" name="op" type="radio"
+			value="+" /><br/>
+			<label for="-">-</label>
+			<input id="op_-" name="op" type="radio"
+			value="-" /><br/>
+			<label for="_">*</label>
+			<input id="op__" name="op" type="radio"
+			value="*" /><br/>
+			<label for="_">/</label>
+			<input id="op__" name="op" type="radio"
+			value="/" /><br/>
+			<br/>
+			<input name="commit" type="submit"
+			value="Calc result" onclick="return send_query();" />
+		</form>
+		<div id="result"></div>
+	</body>
+</html>
